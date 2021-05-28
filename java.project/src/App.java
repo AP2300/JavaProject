@@ -2,13 +2,21 @@ import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import static java.nio.file.StandardWatchEventKinds.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.nio.file.WatchEvent.Kind;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class App {
+
+    File Log= new File(System.getProperty("user.home") + "/desktop/Logs.txt");
 
     public void FileWatcher() throws Exception {
         WatchService watcher = FileSystems.getDefault().newWatchService();
@@ -51,6 +59,7 @@ public class App {
                     break;
                 } 
             }
+            
         }
     }
 
@@ -59,4 +68,15 @@ public class App {
         app.FileWatcher();
     }
 
+    public void Logger(String str) throws IOException{
+        BufferedWriter bw= new BufferedWriter(new FileWriter(Log,true));
+        Date FH=new Date();
+        DateFormat fFH=new SimpleDateFormat("HH:mm dd/MM/yyyy");
+        String LOGS=fFH.format(FH)+"  "+str;
+        bw.write(LOGS);
+        bw.newLine();
+        bw.write("--------------------------------------------------------------------------------------");
+        bw.newLine();
+        bw.close();
+    }
 }
