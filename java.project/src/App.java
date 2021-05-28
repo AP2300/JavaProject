@@ -36,8 +36,7 @@ public class App {
                     if (i > 0) {
                         fe = fileName.toString().substring(i+1);
                     }
-                    System.out.println(fe);
-                    if(fe == "xml"){
+                    if(fe.equals("xml")){
                         System.out.println("archivo xml añadido");
                     }
                 } else if (eventType == ENTRY_DELETE) {
@@ -47,8 +46,10 @@ public class App {
                 }
                 
                 boolean valid = key.reset();
-                if (!valid)
+                if (!valid){
+                    watcher.close(); 
                     break;
+                } 
             }
         }
     }
