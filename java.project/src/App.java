@@ -11,40 +11,49 @@ import java.util.*;
 
 public class App {
 
-    public void FileWatcher() throws Exception{
+    public void FileWatcher() throws Exception {
         WatchService watcher = FileSystems.getDefault().newWatchService();
         Path dir = Paths.get("JavaProject");
         dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
 
-        System.out.println("observando"+ dir.getFileName());
+        System.out.println("observando" + dir.getFileName());
 
-        while(true){
+        while (true) {
             WatchKey key;
 
-            key=watcher.take();
+            key = watcher.take();
 
             List<WatchEvent<?>> ListofEvents = key.pollEvents();
 
-            for(WatchEvent<?> event : ListofEvents){
+            for (WatchEvent<?> event : ListofEvents) {
                 Kind<?> eventType = event.kind();
-                Path fileName = (Path)event.context();
+                Path fileName = (Path) event.context();
 
-                System.out.println(eventType.name()+" evento para " + fileName.toString());
-
-                if(eventType == OVERFLOW){
+                if (eventType == OVERFLOW) {
                     continue;
-                }else if(eventType == ENTRY_CREATE){
+                } else if (eventType == ENTRY_CREATE) {
+                    String fe = "";
+                    int i = fileName.toString().lastIndexOf('.');
+                    if (i > 0) {
+                        fe = fileName.toString().substring(i+1);
+                    }
+                    System.out.println(fe);
+                    if(fe == "xml"){
+                        System.out.println("archivo xml añadido");
+                    }
+                } else if (eventType == ENTRY_DELETE) {
 
-                }else if(eventType == ENTRY_DELETE){
-
-                }else if(eventType == ENTRY_MODIFY){
+                } else if (eventType == ENTRY_MODIFY) {
 
                 }
+                
+                boolean valid = key.reset();
+                if (!valid)
+                    break;
             }
-            boolean valid = key.reset();
-            if(!valid) break;
         }
     }
+
     public static void main(String[] args) throws Exception {
         App app = new App();
         app.FileWatcher();
