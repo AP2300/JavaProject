@@ -16,14 +16,14 @@ import java.util.*;
 
 public class App {
 
-    File Log= new File(System.getProperty("user.home") + "/desktop/Logs.txt");
+    File Log = new File(System.getProperty("user.home") + "/desktop/Logs.txt");
 
     public void FileWatcher() throws Exception {
         WatchService watcher = FileSystems.getDefault().newWatchService();
         Path dir = Paths.get(System.getProperty("user.home") + "/downloads");
         dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
 
-        System.out.println("observando" + dir.getFileName());
+        System.out.println("observando " + dir.getFileName());
 
         while (true) {
             WatchKey key;
@@ -36,30 +36,25 @@ public class App {
                 Kind<?> eventType = event.kind();
                 Path fileName = (Path) event.context();
 
-                if (eventType == OVERFLOW) {
-                    continue;
-                } else if (eventType == ENTRY_CREATE) {
-                    String fe = "";
-                    int i = fileName.toString().lastIndexOf('.');
-                    if (i > 0) {
-                        fe = fileName.toString().substring(i+1);
+                if (CheckXML(fileName)) {
+                    if (eventType == OVERFLOW) {
+                        continue;
+                    } else if (eventType == ENTRY_CREATE) {
+                            Logger("Archivo " + fileName.toString() + " Creado");
+                    } else if (eventType == ENTRY_DELETE) {
+                            Logger("Archivo " + fileName.toString() + " Eliminado");
+                    } else if (eventType == ENTRY_MODIFY) {
+                            Logger("Archivo " + fileName.toString() + " Modificado");
                     }
-                    if(fe.equals("xml")){
-                        System.out.println("archivo xml añadido");
-                    }
-                } else if (eventType == ENTRY_DELETE) {
-
-                } else if (eventType == ENTRY_MODIFY) {
-
                 }
-                
+
                 boolean valid = key.reset();
-                if (!valid){
-                    watcher.close(); 
+                if (!valid) {
+                    watcher.close();
                     break;
-                } 
+                }
             }
-            
+
         }
     }
 
@@ -68,11 +63,21 @@ public class App {
         app.FileWatcher();
     }
 
-    public void Logger(String str) throws IOException{
-        BufferedWriter bw= new BufferedWriter(new FileWriter(Log,true));
-        Date FH=new Date();
-        DateFormat fFH=new SimpleDateFormat("HH:mm dd/MM/yyyy");
-        String LOGS=fFH.format(FH)+"  "+str;
+    public Boolean CheckXML(Path filename) {
+        String fe = "";
+        int i = filename.toString().lastIndexOf('.');
+        if (i > 0) {
+            fe = filename.toString().substring(i + 1);
+        }
+        Boolean result = fe.equals("xml");
+        return result;
+    }
+
+    public void Logger(String str) throws IOException {
+        BufferedWriter bw = new BufferedWriter(new FileWriter(Log, true));
+        Date FH = new Date();
+        DateFormat fFH = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy");
+        String LOGS = fFH.format(FH) + "  " + str;
         bw.write(LOGS);
         bw.newLine();
         bw.write("--------------------------------------------------------------------------------------");
