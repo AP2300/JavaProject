@@ -6,17 +6,16 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.nio.file.WatchEvent.Kind;
-import java.nio.file.NoSuchFileException;
 import java.util.*;
 
 public class App {
 
     public void FileWatcher() throws Exception{
         WatchService watcher = FileSystems.getDefault().newWatchService();
-        Path dir = Paths.get("JavaProject");
+        Path dir = Paths.get(System.getProperty("user.home") + "/downloads");
         dir.register(watcher, ENTRY_CREATE, ENTRY_DELETE, ENTRY_MODIFY);
 
-        System.out.println("observando"+ dir.getFileName());
+        System.out.println("observando "+ dir.getFileName());
 
         while(true){
             WatchKey key;
@@ -29,12 +28,12 @@ public class App {
                 Kind<?> eventType = event.kind();
                 Path fileName = (Path)event.context();
 
-                System.out.println(eventType.name()+" evento para " + fileName.toString());
+                System.out.println(eventType.name()+" para " + fileName.toString());
 
                 if(eventType == OVERFLOW){
                     continue;
                 }else if(eventType == ENTRY_CREATE){
-
+                    System.out.println(fileName.endsWith("xml"));
                 }else if(eventType == ENTRY_DELETE){
 
                 }else if(eventType == ENTRY_MODIFY){
@@ -49,4 +48,5 @@ public class App {
         App app = new App();
         app.FileWatcher();
     }
+
 }

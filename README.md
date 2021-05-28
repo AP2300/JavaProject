@@ -1,2 +1,0 @@
-# JavaProject
-proyecto de skyrise
