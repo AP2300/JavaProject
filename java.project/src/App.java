@@ -40,11 +40,12 @@ public class App {
                     if (eventType == OVERFLOW) {
                         continue;
                     } else if (eventType == ENTRY_CREATE) {
-                            Logger("Archivo " + fileName.toString() + " Creado");
+                        Logger("Archivo " + fileName.toString() + " Creado");
+
                     } else if (eventType == ENTRY_DELETE) {
-                            Logger("Archivo " + fileName.toString() + " Eliminado");
+                        Logger("Archivo " + fileName.toString() + " Eliminado");
                     } else if (eventType == ENTRY_MODIFY) {
-                            Logger("Archivo " + fileName.toString() + " Modificado");
+                        // Logger("Archivo " + fileName.toString() + " Modificado");
                     }
                 }
 
@@ -54,9 +55,17 @@ public class App {
                     break;
                 }
             }
-
+            System.gc();
         }
     }
+
+    // private void esperarXsegundos(int segundos) {
+    //     try {
+    //         Thread.sleep(segundos * 1000);
+    //     } catch (InterruptedException ex) {
+    //         Thread.currentThread().interrupt();
+    //     }
+    // }
 
     public static void main(String[] args) throws Exception {
         App app = new App();
