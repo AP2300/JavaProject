@@ -12,9 +12,23 @@ import java.nio.file.WatchService;
 import java.nio.file.WatchEvent.Kind;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.swing.text.AbstractDocument.DefaultDocumentEvent;
+import javax.xml.parsers.DocumentBuilder;
+
+import org.graalvm.compiler.code.DataSection;
+import org.w3c.dom.Document;  
+import org.w3c.dom.NodeList;  
+import org.w3c.dom.Node;  
+import org.w3c.dom.Element;
 import java.util.*;
 
 public class App {
+
+    public static void main(String[] args) throws Exception {
+        App app = new App();
+        app.FileWatcher();
+    }
 
     File Log = new File(System.getProperty("user.home") + "/desktop/Logs.txt");
 
@@ -41,7 +55,7 @@ public class App {
                         continue;
                     } else if (eventType == ENTRY_CREATE) {
                         Logger("Archivo " + fileName.toString() + " Creado");
-
+                        TranslateXML(fileName.toString());
                     } else if (eventType == ENTRY_DELETE) {
                         Logger("Archivo " + fileName.toString() + " Eliminado");
                     } else if (eventType == ENTRY_MODIFY) {
@@ -55,22 +69,19 @@ public class App {
                     break;
                 }
             }
+            key = null;
+            ListofEvents= null;
             System.gc();
         }
     }
 
-    // private void esperarXsegundos(int segundos) {
+    // private void TimeOut(int segundos) {
     //     try {
     //         Thread.sleep(segundos * 1000);
     //     } catch (InterruptedException ex) {
     //         Thread.currentThread().interrupt();
     //     }
     // }
-
-    public static void main(String[] args) throws Exception {
-        App app = new App();
-        app.FileWatcher();
-    }
 
     public Boolean CheckXML(Path filename) {
         String fe = "";
@@ -93,4 +104,19 @@ public class App {
         bw.newLine();
         bw.close();
     }
+
+    public void TranslateXML(String name) throws Exception {
+        File XML = new File(System.getProperty("user.home") + "/downloads/"+name);
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        DocumentBuilder db = dbf.newDocumentBuilder();
+        Document doc = db.parse(XML);
+        doc.getDocumentElement().normalize();
+        NodeList tagList = doc.getElementsByTagName("header");
+        System.out.println(tagList.toString());
+
+        // for (int i = 0; i < tagList.getLength(); i++) {
+
+        // }
+    }
 }
+    
