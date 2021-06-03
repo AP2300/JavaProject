@@ -105,7 +105,7 @@ public class App {
         bw.close();
     }
 
-    public void toText(HashMap<String, String> data, HashMap<String, String[]> products, HashMap<String, String> total)
+    public void toText(HashMap<String, String> data, HashMap<String, String[]> products, HashMap<String, String> total, Object[] product)
             throws IOException {
         // System.out.println("hola");
         BufferedWriter bw = new BufferedWriter(new FileWriter(FinalFile, true));
@@ -125,13 +125,19 @@ public class App {
         bw.newLine();
         bw.write("Fecha: \t\t\t\t" + data.get("fecha"));
         bw.newLine();
-        bw.write("--------------------------------------------------------------------------------------");
+        bw.write("--------------------------------------------------------");
         bw.newLine();
         for (String[] i : products.values()) {
-            for (int j = 0; j < i.length; j++) {
-                bw.write("Fecha: \t\t\t\t" + i[j]);
+                bw.write("Codigo: \t\t\t\t" + i[1]);
                 bw.newLine();
-            }
+                bw.write("Descripcion: \t\t\t\t" + i[3]);
+                bw.newLine();
+                bw.write("Precio Unitario: \t\t\t\t" + i[5]);
+                bw.newLine();
+                bw.write("Cantidad: \t\t\t\t" + i[7]);
+                bw.newLine();
+                bw.write("Total: \t\t\t\t" + i[9]);
+                bw.newLine();
         }
         bw.write("--------------------------------------------------------------------------------------");
         bw.newLine();
@@ -157,6 +163,7 @@ public class App {
 
         HashMap<String, String> TicketData = new HashMap<String, String>();
         HashMap<String, String[]> TicketProducts = new HashMap<String, String[]>();
+        Object[] Products = new Object[ProductsList.getLength()];
         HashMap<String, String> TicketTotal = new HashMap<String, String>();
 
         Node Headernode = HeaderList.item(0);
@@ -176,6 +183,7 @@ public class App {
         for (int i = 0; i < ProductsList.getLength(); i++) {
             Node Productonode = ProductsList.item(i);
             String[] temp = new String[32];
+            HashMap<String, String> Product = new HashMap<String, String>();
 
             if (Productonode.getNodeType() == Node.ELEMENT_NODE) {
                 Element eElement = (Element) Productonode;
@@ -185,9 +193,11 @@ public class App {
                     Node Cnode = ChildElement.item(j);
                     if (Cnode.getNodeType() == Node.ELEMENT_NODE) {
                         temp[j] = Cnode.getTextContent();
+                        Product.put(Cnode.getNodeName(), Cnode.getTextContent());
                     }
                 }
                 TicketProducts.put("Producto " + i, temp);
+                Products[i] = Product;
             }
         }
 
@@ -205,7 +215,7 @@ public class App {
             }
         }
 
-        toText(TicketData, TicketProducts, TicketTotal);
+        toText(TicketData, TicketProducts, TicketTotal, Products);
         TicketData = null;
         TicketProducts = null;
         TicketTotal = null;
