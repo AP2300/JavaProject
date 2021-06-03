@@ -77,45 +77,57 @@ public class App {
     }
 
     // public void TranslateXML(String name) throws Exception {
-    //     File XML = new File(System.getProperty("user.home") + "/downloads/" + name);
-    //     DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-    //     DocumentBuilder db = dbf.newDocumentBuilder();
-    //     Document doc = db.parse(XML);
-    //     doc.getDocumentElement().normalize();
-    //     NodeList headerList = doc.getElementsByTagName("header");
+    // File XML = new File(System.getProperty("user.home") + "/downloads/" + name);
+    // DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+    // DocumentBuilder db = dbf.newDocumentBuilder();
+    // Document doc = db.parse(XML);
+    // doc.getDocumentElement().normalize();
+    // NodeList headerList = doc.getElementsByTagName("header");
 
-    //     for (int itr = 0; itr < headerList.getLength(); itr++) {
-    //         System.out.println("Nro de Iteracion: "+itr);
-    //         Node node = headerList.item(itr);
-    //         System.out.println("\nNode Name: " + node.getNodeName());
-    //         if (node.getNodeType() == Node.ELEMENT_NODE) {
-    //             Element eElement = (Element) node;
-    //             System.out.println("Razon Social: " + eElement.getElementsByTagName("razonSocial").item(0).getTextContent());
-    //             System.out.println("Rif: " + eElement.getElementsByTagName("rifEmpresa").item(0).getTextContent());
-    //             System.out.println("Direccion: " + eElement.getElementsByTagName("direccionEmpresa").item(0).getTextContent());
-    //             System.out.println("Nro Control: " + eElement.getElementsByTagName("nroControl").item(0).getTextContent());
-    //             System.out.println("Cliente: " + eElement.getElementsByTagName("cliente").item(0).getTextContent());
-    //             System.out.println("Cedula: " + eElement.getElementsByTagName("cedula").item(0).getTextContent());
-    //             System.out.println("Fecha: " + eElement.getElementsByTagName("fecha").item(0).getTextContent());
-    //         }
-    //     }
+    // for (int itr = 0; itr < headerList.getLength(); itr++) {
+    // System.out.println("Nro de Iteracion: "+itr);
+    // Node node = headerList.item(itr);
+    // System.out.println("\nNode Name: " + node.getNodeName());
+    // if (node.getNodeType() == Node.ELEMENT_NODE) {
+    // Element eElement = (Element) node;
+    // System.out.println("Razon Social: " +
+    // eElement.getElementsByTagName("razonSocial").item(0).getTextContent());
+    // System.out.println("Rif: " +
+    // eElement.getElementsByTagName("rifEmpresa").item(0).getTextContent());
+    // System.out.println("Direccion: " +
+    // eElement.getElementsByTagName("direccionEmpresa").item(0).getTextContent());
+    // System.out.println("Nro Control: " +
+    // eElement.getElementsByTagName("nroControl").item(0).getTextContent());
+    // System.out.println("Cliente: " +
+    // eElement.getElementsByTagName("cliente").item(0).getTextContent());
+    // System.out.println("Cedula: " +
+    // eElement.getElementsByTagName("cedula").item(0).getTextContent());
+    // System.out.println("Fecha: " +
+    // eElement.getElementsByTagName("fecha").item(0).getTextContent());
+    // }
+    // }
 
-    //     NodeList detailsList = doc.getElementsByTagName("producto");
-    //     System.out.println(detailsList.getLength());
+    // NodeList detailsList = doc.getElementsByTagName("producto");
+    // System.out.println(detailsList.getLength());
 
-    //     for (int itr = 0; itr < detailsList.getLength(); itr++) {
-    //         System.out.println("Nro de Iteracion: "+itr);
-    //         Node node = detailsList.item(itr);
-    //         System.out.println("\nNode Name: " + node.getNodeName());
-    //         if (node.getNodeType() == Node.ELEMENT_NODE) {
-    //             Element eElement = (Element) node;
-    //             System.out.println("Codigo: " + eElement.getElementsByTagName("codigo").item(0).getTextContent());
-    //             System.out.println("Descripcion: " + eElement.getElementsByTagName("descripcion").item(0).getTextContent());
-    //             System.out.println("Precio Unitario: " + eElement.getElementsByTagName("precioUnitario").item(0).getTextContent());
-    //             System.out.println("Cantidad: " + eElement.getElementsByTagName("cantidad").item(0).getTextContent());
-    //             System.out.println("total: " + eElement.getElementsByTagName("total").item(0).getTextContent());
-    //         }
-    //     }
+    // for (int itr = 0; itr < detailsList.getLength(); itr++) {
+    // System.out.println("Nro de Iteracion: "+itr);
+    // Node node = detailsList.item(itr);
+    // System.out.println("\nNode Name: " + node.getNodeName());
+    // if (node.getNodeType() == Node.ELEMENT_NODE) {
+    // Element eElement = (Element) node;
+    // System.out.println("Codigo: " +
+    // eElement.getElementsByTagName("codigo").item(0).getTextContent());
+    // System.out.println("Descripcion: " +
+    // eElement.getElementsByTagName("descripcion").item(0).getTextContent());
+    // System.out.println("Precio Unitario: " +
+    // eElement.getElementsByTagName("precioUnitario").item(0).getTextContent());
+    // System.out.println("Cantidad: " +
+    // eElement.getElementsByTagName("cantidad").item(0).getTextContent());
+    // System.out.println("total: " +
+    // eElement.getElementsByTagName("total").item(0).getTextContent());
+    // }
+    // }
     // }
 
     public Boolean CheckXML(Path filename) {
@@ -140,7 +152,7 @@ public class App {
         bw.close();
     }
 
-    public void toText(String data) throws IOException{
+    public void toText(String data) throws IOException {
         BufferedWriter bw = new BufferedWriter(new FileWriter(FinalFile, true));
         bw.write("Skyrise Technology \n Corporation, C.A \n J-407640127");
         bw.newLine();
@@ -157,22 +169,26 @@ public class App {
         NodeList HeaderList = doc.getElementsByTagName("header");
         NodeList ProductsList = doc.getElementsByTagName("producto");
 
-            Node Headernode = HeaderList.item(0);
-            if (Headernode.getNodeType() == Node.ELEMENT_NODE) {
-                Element eElement = (Element) Headernode;
-                NodeList ChildElement = eElement.getChildNodes();
+        HashMap<String, String> TicketData = new HashMap<String, String>();
+        HashMap<String, String[]> TicketProducts = new HashMap<String, String[]>();
 
-                for (int j = 0; j < ChildElement.getLength(); j++) {
-                    Node Cnode = ChildElement.item(j);
-                    
-                    if(Cnode.getNodeType() == Node.ELEMENT_NODE){
-                        System.out.println( Cnode.getNodeName() + " " + Cnode.getTextContent());
-                    }
+        Node Headernode = HeaderList.item(0);
+        if (Headernode.getNodeType() == Node.ELEMENT_NODE) {
+            Element eElement = (Element) Headernode;
+            NodeList ChildElement = eElement.getChildNodes();
+
+            for (int j = 0; j < ChildElement.getLength(); j++) {
+                Node Cnode = ChildElement.item(j);
+
+                if (Cnode.getNodeType() == Node.ELEMENT_NODE) {
+                    TicketData.put(Cnode.getNodeName(), Cnode.getTextContent());
                 }
             }
+        }
 
         for (int i = 0; i < ProductsList.getLength(); i++) {
             Node Productonode = ProductsList.item(i);
+            String[] temp = new String[10];
 
             if (Productonode.getNodeType() == Node.ELEMENT_NODE) {
                 Element eElement = (Element) Productonode;
@@ -181,11 +197,17 @@ public class App {
                 for (int j = 0; j < ChildElement.getLength(); j++) {
                     Node Cnode = ChildElement.item(j);
 
-                    if(Cnode.getNodeType() == Node.ELEMENT_NODE){
-                        System.out.println( Cnode.getNodeName() + " " + Cnode.getTextContent());
+                    if (Cnode.getNodeType() == Node.ELEMENT_NODE) {
+                        temp[j] = Cnode.getTextContent();
                     }
                 }
+                TicketProducts.put("producto " + i, temp);
             }
+            temp = null;
         }
+        // TicketData = null;
+        // TicketProducts = null;
+        System.gc();
     }
+
 }
