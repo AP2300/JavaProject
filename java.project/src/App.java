@@ -16,10 +16,10 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.swing.text.AbstractDocument.DefaultDocumentEvent;
 import javax.xml.parsers.DocumentBuilder;
 
-import org.graalvm.compiler.code.DataSection;
-import org.w3c.dom.Document;  
-import org.w3c.dom.NodeList;  
-import org.w3c.dom.Node;  
+// import org.graalvm.compiler.code.DataSection;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 import java.util.*;
 
@@ -70,17 +70,17 @@ public class App {
                 }
             }
             key = null;
-            ListofEvents= null;
+            ListofEvents = null;
             System.gc();
         }
     }
 
     // private void TimeOut(int segundos) {
-    //     try {
-    //         Thread.sleep(segundos * 1000);
-    //     } catch (InterruptedException ex) {
-    //         Thread.currentThread().interrupt();
-    //     }
+    // try {
+    // Thread.sleep(segundos * 1000);
+    // } catch (InterruptedException ex) {
+    // Thread.currentThread().interrupt();
+    // }
     // }
 
     public Boolean CheckXML(Path filename) {
@@ -106,17 +106,28 @@ public class App {
     }
 
     public void TranslateXML(String name) throws Exception {
-        File XML = new File(System.getProperty("user.home") + "/downloads/"+name);
+        File XML = new File(System.getProperty("user.home") + "/downloads/" + name);
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
         Document doc = db.parse(XML);
         doc.getDocumentElement().normalize();
         NodeList tagList = doc.getElementsByTagName("header");
-        System.out.println(tagList.toString());
 
-        // for (int i = 0; i < tagList.getLength(); i++) {
+        for (int i = 0; i < tagList.getLength(); i++) {
+            Node node = tagList.item(i);
 
-        // }
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                Element eElement = (Element) node;
+                NodeList ChildElement = eElement.getChildNodes();
+
+                for (int j = 0; j < ChildElement.getLength(); j++) {
+                    Node Cnode = ChildElement.item(j);
+                    
+                    if(Cnode.getNodeType() == Node.ELEMENT_NODE){
+                        System.out.println( Cnode.getTextContent());
+                    }
+                }
+            }
+        }
     }
 }
-    
