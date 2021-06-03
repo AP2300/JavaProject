@@ -52,7 +52,9 @@ public class App {
                     if (eventType == OVERFLOW) {
                         continue;
                     } else if (eventType == ENTRY_CREATE) {
+                        System.out.println(fileName.toAbsolutePath());
                         Logger("Archivo " + fileName.toString() + " Creado");
+                        Await(1);
                         TranslateXML(fileName.toString());
                     } else if (eventType == ENTRY_DELETE) {
                         Logger("Archivo " + fileName.toString() + " Eliminado");
@@ -73,59 +75,13 @@ public class App {
         }
     }
 
-    // public void TranslateXML(String name) throws Exception {
-    // File XML = new File(System.getProperty("user.home") + "/downloads/" + name);
-    // DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-    // DocumentBuilder db = dbf.newDocumentBuilder();
-    // Document doc = db.parse(XML);
-    // doc.getDocumentElement().normalize();
-    // NodeList headerList = doc.getElementsByTagName("header");
-
-    // for (int itr = 0; itr < headerList.getLength(); itr++) {
-    // System.out.println("Nro de Iteracion: "+itr);
-    // Node node = headerList.item(itr);
-    // System.out.println("\nNode Name: " + node.getNodeName());
-    // if (node.getNodeType() == Node.ELEMENT_NODE) {
-    // Element eElement = (Element) node;
-    // System.out.println("Razon Social: " +
-    // eElement.getElementsByTagName("razonSocial").item(0).getTextContent());
-    // System.out.println("Rif: " +
-    // eElement.getElementsByTagName("rifEmpresa").item(0).getTextContent());
-    // System.out.println("Direccion: " +
-    // eElement.getElementsByTagName("direccionEmpresa").item(0).getTextContent());
-    // System.out.println("Nro Control: " +
-    // eElement.getElementsByTagName("nroControl").item(0).getTextContent());
-    // System.out.println("Cliente: " +
-    // eElement.getElementsByTagName("cliente").item(0).getTextContent());
-    // System.out.println("Cedula: " +
-    // eElement.getElementsByTagName("cedula").item(0).getTextContent());
-    // System.out.println("Fecha: " +
-    // eElement.getElementsByTagName("fecha").item(0).getTextContent());
-    // }
-    // }
-
-    // NodeList detailsList = doc.getElementsByTagName("producto");
-    // System.out.println(detailsList.getLength());
-
-    // for (int itr = 0; itr < detailsList.getLength(); itr++) {
-    // System.out.println("Nro de Iteracion: "+itr);
-    // Node node = detailsList.item(itr);
-    // System.out.println("\nNode Name: " + node.getNodeName());
-    // if (node.getNodeType() == Node.ELEMENT_NODE) {
-    // Element eElement = (Element) node;
-    // System.out.println("Codigo: " +
-    // eElement.getElementsByTagName("codigo").item(0).getTextContent());
-    // System.out.println("Descripcion: " +
-    // eElement.getElementsByTagName("descripcion").item(0).getTextContent());
-    // System.out.println("Precio Unitario: " +
-    // eElement.getElementsByTagName("precioUnitario").item(0).getTextContent());
-    // System.out.println("Cantidad: " +
-    // eElement.getElementsByTagName("cantidad").item(0).getTextContent());
-    // System.out.println("total: " +
-    // eElement.getElementsByTagName("total").item(0).getTextContent());
-    // }
-    // }
-    // }
+    private void Await(int segundos) {
+        try {
+            Thread.sleep(segundos * 1000);
+        } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
+    }
 
     public Boolean CheckXML(Path filename) {
         String fe = "";
@@ -150,6 +106,7 @@ public class App {
     }
 
     public void toText(HashMap<String, String> data, HashMap<String, String[]> products) throws IOException {
+        System.out.println("hola");
         // BufferedWriter bw = new BufferedWriter(new FileWriter(FinalFile, true));
         // bw.write("Skyrise Technology \n Corporation, C.A \n J-407640127");
         // bw.newLine();
