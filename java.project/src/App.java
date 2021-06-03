@@ -55,11 +55,11 @@ public class App {
                         // System.out.println(fileName.getFileName());
                         Logger("Archivo " + fileName.toString() + " Creado");
                         Await(1);
-                        TranslateXML(fileName.toString());
                     } else if (eventType == ENTRY_DELETE) {
                         Logger("Archivo " + fileName.toString() + " Eliminado");
                     } else if (eventType == ENTRY_MODIFY) {
-                        // Logger("Archivo " + fileName.toString() + " Modificado");
+                        Logger("Archivo " + fileName.toString() + " Creado");
+                        TranslateXML(fileName.toString());
                     }
                 }
 
