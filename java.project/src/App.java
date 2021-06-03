@@ -31,6 +31,7 @@ public class App {
     }
 
     File Log = new File(System.getProperty("user.home") + "/desktop/Logs.txt");
+    File FinalFile = new File(System.getProperty("user.home") + "/desktop/Factura.txt");
 
     public void FileWatcher() throws Exception {
         WatchService watcher = FileSystems.getDefault().newWatchService();
@@ -105,6 +106,14 @@ public class App {
         bw.close();
     }
 
+    public void toText(String data) throws IOException{
+        BufferedWriter bw = new BufferedWriter(new FileWriter(FinalFile, true));
+        bw.write("Skyrise Technology \n Corporation, C.A \n J-407640127");
+        bw.newLine();
+        bw.write("Nro de control :" + data);
+        bw.write("C.I: " + data);
+    }
+
     public void TranslateXML(String name) throws Exception {
         File XML = new File(System.getProperty("user.home") + "/downloads/" + name);
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -122,7 +131,7 @@ public class App {
 
                 for (int j = 0; j < ChildElement.getLength(); j++) {
                     Node Cnode = ChildElement.item(j);
-                    
+
                     if(Cnode.getNodeType() == Node.ELEMENT_NODE){
                         System.out.println( Cnode.getTextContent());
                     }
