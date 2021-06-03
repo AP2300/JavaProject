@@ -52,14 +52,13 @@ public class App {
                     if (eventType == OVERFLOW) {
                         continue;
                     } else if (eventType == ENTRY_CREATE) {
-                        System.out.println(fileName.toAbsolutePath());
-                        Logger("Archivo " + fileName.toString() + " Creado");
+                        System.out.println("putabida");
                         Await(1);
-                        TranslateXML(fileName.toString());
                     } else if (eventType == ENTRY_DELETE) {
                         Logger("Archivo " + fileName.toString() + " Eliminado");
                     } else if (eventType == ENTRY_MODIFY) {
-                        // Logger("Archivo " + fileName.toString() + " Modificado");
+                        Logger("Archivo " + fileName.toString() + " Creado");
+                        TranslateXML(fileName.toString());
                     }
                 }
 
