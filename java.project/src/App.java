@@ -13,10 +13,7 @@ import java.nio.file.WatchEvent.Kind;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.swing.text.AbstractDocument.DefaultDocumentEvent;
 import javax.xml.parsers.DocumentBuilder;
-
-// import org.graalvm.compiler.code.DataSection;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
@@ -152,12 +149,12 @@ public class App {
         bw.close();
     }
 
-    public void toText(String data) throws IOException {
-        BufferedWriter bw = new BufferedWriter(new FileWriter(FinalFile, true));
-        bw.write("Skyrise Technology \n Corporation, C.A \n J-407640127");
-        bw.newLine();
-        bw.write("Nro de control :" + data);
-        bw.write("C.I: " + data);
+    public void toText(HashMap<String, String> data, HashMap<String, String[]> products) throws IOException {
+        // BufferedWriter bw = new BufferedWriter(new FileWriter(FinalFile, true));
+        // bw.write("Skyrise Technology \n Corporation, C.A \n J-407640127");
+        // bw.newLine();
+        // bw.write("Nro de control :" + data);
+        // bw.write("C.I: " + data);
     }
 
     public void TranslateXML(String name) throws Exception {
@@ -165,6 +162,7 @@ public class App {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
         Document doc = db.parse(XML);
+
         doc.getDocumentElement().normalize();
         NodeList HeaderList = doc.getElementsByTagName("header");
         NodeList ProductsList = doc.getElementsByTagName("producto");
@@ -205,8 +203,14 @@ public class App {
             }
             temp = null;
         }
-        // TicketData = null;
-        // TicketProducts = null;
+        toText(TicketData, TicketProducts);
+        TicketData = null;
+        TicketProducts = null;
+        dbf = null;
+        db = null;
+        doc = null;
+        HeaderList = null;
+        ProductsList = null;
         System.gc();
     }
 
