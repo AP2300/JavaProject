@@ -52,7 +52,8 @@ public class App {
                     if (eventType == OVERFLOW) {
                         continue;
                     } else if (eventType == ENTRY_CREATE) {
-                        System.out.println("putabida");
+                        // System.out.println(fileName.getFileName());
+                        Logger("Archivo " + fileName.toString() + " Creado");
                         Await(1);
                     } else if (eventType == ENTRY_DELETE) {
                         Logger("Archivo " + fileName.toString() + " Eliminado");
@@ -104,13 +105,49 @@ public class App {
         bw.close();
     }
 
-    public void toText(HashMap<String, String> data, HashMap<String, String[]> products) throws IOException {
-        System.out.println("hola");
-        // BufferedWriter bw = new BufferedWriter(new FileWriter(FinalFile, true));
-        // bw.write("Skyrise Technology \n Corporation, C.A \n J-407640127");
+    public void toText(HashMap<String, String> data, HashMap<String, String[]> products, HashMap<String, String> total, Object[] product)
+            throws IOException {
+        // System.out.println("hola");
+        BufferedWriter bw = new BufferedWriter(new FileWriter(FinalFile, true));
+        // bw.write("Skyrise Technology \n Corporation, C.A" );
+        // bw.write(data.get("razonSocial"));
         // bw.newLine();
-        // bw.write("Nro de control :" + data);
-        // bw.write("C.I: " + data);
+        // bw.write(data.get("direccionEmpresa"));
+        // bw.newLine();
+        // bw.write("J-" + data.get("rifEmpresa"));
+        // bw.newLine();
+        // bw.newLine();
+        // bw.write("Nro de control: \t\t" + data.get("nroControl"));
+        // bw.newLine();
+        // bw.write("Cliente: \t\t\t" + data.get("cliente"));
+        // bw.newLine();
+        // bw.write("C.I: \t\t\t\t " + data.get("cedula"));
+        // bw.newLine();
+        // bw.write("Fecha: \t\t\t\t" + data.get("fecha"));
+        // bw.newLine();
+        // bw.write("--------------------------------------------------------");
+        // bw.newLine();
+        // for (String[] i : products.values()) {
+        //         bw.write("Codigo: \t\t\t\t" + i[1]);
+        //         bw.newLine();
+        //         bw.write("Descripcion: \t\t\t\t" + i[3]);
+        //         bw.newLine();
+        //         bw.write("Precio Unitario: \t\t\t\t" + i[5]);
+        //         bw.newLine();
+        //         bw.write("Cantidad: \t\t\t\t" + i[7]);
+        //         bw.newLine();
+        //         bw.write("Total: \t\t\t\t" + i[9]);
+        //         bw.newLine();
+        // }
+        // bw.write("--------------------------------------------------------------------------------------");
+        // bw.newLine();
+        // bw.write("Sub-Total: \t\t\t\t" + total.get("subtotal"));
+        // bw.newLine();
+        // bw.write("IVA (16%): \t\t\t\t" + total.get("iva"));
+        // bw.newLine();
+        // bw.write("Total: \t\t\t\t" + total.get("total"));
+        // bw.newLine();
+        // bw.close();
     }
 
     public void TranslateXML(String name) throws Exception {
@@ -122,9 +159,12 @@ public class App {
         doc.getDocumentElement().normalize();
         NodeList HeaderList = doc.getElementsByTagName("header");
         NodeList ProductsList = doc.getElementsByTagName("producto");
+        NodeList TotalList = doc.getElementsByTagName("totales");
 
         HashMap<String, String> TicketData = new HashMap<String, String>();
         HashMap<String, String[]> TicketProducts = new HashMap<String, String[]>();
+        Object[] Products = new Object[ProductsList.getLength()];
+        HashMap<String, String> TicketTotal = new HashMap<String, String>();
 
         int pos = 0;
 
@@ -163,14 +203,31 @@ public class App {
             temp = null;
             pos=0;
         }
-        toText(TicketData, TicketProducts);
+
+        Node Totalnode = TotalList.item(0);
+        if (Totalnode.getNodeType() == Node.ELEMENT_NODE) {
+            Element eElement = (Element) Totalnode;
+            NodeList ChildElement = eElement.getChildNodes();
+
+            for (int j = 0; j < ChildElement.getLength(); j++) {
+                Node Cnode = ChildElement.item(j);
+
+                if (Cnode.getNodeType() == Node.ELEMENT_NODE) {
+                    TicketTotal.put(Cnode.getNodeName(), Cnode.getTextContent());
+                }
+            }
+        }
+
+        toText(TicketData, TicketProducts, TicketTotal, Products);
         TicketData = null;
         TicketProducts = null;
+        TicketTotal = null;
         dbf = null;
         db = null;
         doc = null;
         HeaderList = null;
         ProductsList = null;
+        XML = null;
         System.gc();
     }
 
