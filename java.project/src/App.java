@@ -126,6 +126,8 @@ public class App {
         HashMap<String, String> TicketData = new HashMap<String, String>();
         HashMap<String, String[]> TicketProducts = new HashMap<String, String[]>();
 
+        int pos = 0;
+
         Node Headernode = HeaderList.item(0);
         if (Headernode.getNodeType() == Node.ELEMENT_NODE) {
             Element eElement = (Element) Headernode;
@@ -142,7 +144,7 @@ public class App {
 
         for (int i = 0; i < ProductsList.getLength(); i++) {
             Node Productonode = ProductsList.item(i);
-            String[] temp = new String[10];
+            String[] temp = new String[5];
 
             if (Productonode.getNodeType() == Node.ELEMENT_NODE) {
                 Element eElement = (Element) Productonode;
@@ -151,13 +153,15 @@ public class App {
                 for (int j = 0; j < ChildElement.getLength(); j++) {
                     Node Cnode = ChildElement.item(j);
 
-                    if (Cnode.getNodeType() == Node.ELEMENT_NODE) {
-                        temp[j] = Cnode.getTextContent();
+                    if (Cnode.getNodeType() == Node.ELEMENT_NODE && pos < 5) {
+                        temp[pos] = Cnode.getTextContent();
+                        pos++;
                     }
                 }
-                TicketProducts.put("producto " + i, temp);
+                TicketProducts.put("producto" + i, temp);
             }
             temp = null;
+            pos=0;
         }
         toText(TicketData, TicketProducts);
         TicketData = null;
