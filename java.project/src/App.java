@@ -16,6 +16,9 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
+
+import jdk.internal.net.http.common.Log;
+
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 import java.util.*;
@@ -105,49 +108,61 @@ public class App {
         bw.close();
     }
 
-    public void toText(HashMap<String, String> data, HashMap<String, String[]> products, HashMap<String, String> total, Object[] product)
+    public String Spacing(HashMap<String, String[]> products, String comparator) {
+        String spc = "";
+
+        String ref = products.get("producto1")[3] + " x  " + products.get("producto1")[1];
+        for (String[] i : products.values()) {
+            if (ref.length() < (i[3] + " x  " + i[1]).length()) {
+                ref = i[3] + " x  " + i[1];
+            }
+        }
+
+        int itr = comparator.equals("") ? 19 : (ref.length() - comparator.length()) + 4;
+
+        for (int i = 0; i < itr; i++) {
+            spc += " ";
+        }
+
+        return spc;
+    }
+
+    public void toText(HashMap<String, String> data, HashMap<String, String[]> products, HashMap<String, String> total)
             throws IOException {
-        // System.out.println("hola");
         BufferedWriter bw = new BufferedWriter(new FileWriter(FinalFile, true));
-        // bw.write("Skyrise Technology \n Corporation, C.A" );
-        // bw.write(data.get("razonSocial"));
-        // bw.newLine();
-        // bw.write(data.get("direccionEmpresa"));
-        // bw.newLine();
-        // bw.write("J-" + data.get("rifEmpresa"));
-        // bw.newLine();
-        // bw.newLine();
-        // bw.write("Nro de control: \t\t" + data.get("nroControl"));
-        // bw.newLine();
-        // bw.write("Cliente: \t\t\t" + data.get("cliente"));
-        // bw.newLine();
-        // bw.write("C.I: \t\t\t\t " + data.get("cedula"));
-        // bw.newLine();
-        // bw.write("Fecha: \t\t\t\t" + data.get("fecha"));
-        // bw.newLine();
-        // bw.write("--------------------------------------------------------");
-        // bw.newLine();
-        // for (String[] i : products.values()) {
-        //         bw.write("Codigo: \t\t\t\t" + i[1]);
-        //         bw.newLine();
-        //         bw.write("Descripcion: \t\t\t\t" + i[3]);
-        //         bw.newLine();
-        //         bw.write("Precio Unitario: \t\t\t\t" + i[5]);
-        //         bw.newLine();
-        //         bw.write("Cantidad: \t\t\t\t" + i[7]);
-        //         bw.newLine();
-        //         bw.write("Total: \t\t\t\t" + i[9]);
-        //         bw.newLine();
-        // }
-        // bw.write("--------------------------------------------------------------------------------------");
-        // bw.newLine();
-        // bw.write("Sub-Total: \t\t\t\t" + total.get("subtotal"));
-        // bw.newLine();
-        // bw.write("IVA (16%): \t\t\t\t" + total.get("iva"));
-        // bw.newLine();
-        // bw.write("Total: \t\t\t\t" + total.get("total"));
-        // bw.newLine();
-        // bw.close();
+        bw.write(Spacing(products, "") + data.get("razonSocial"));
+        bw.newLine();
+        bw.write(Spacing(products, "") + "     " + data.get("direccionEmpresa"));
+        bw.newLine();
+        bw.write(Spacing(products, "") + "  J-" + data.get("rifEmpresa"));
+        bw.newLine();
+        bw.newLine();
+        bw.write("Nro de control: \t\t\t      " + data.get("nroControl"));
+        bw.newLine();
+        bw.write("Cliente: \t\t\t\t      " + data.get("cliente"));
+        bw.newLine();
+        bw.write("C.I: \t\t\t\t\t      " + data.get("cedula"));
+        bw.newLine();
+        bw.write("Fecha: \t\t\t\t\t      " + data.get("fecha"));
+        bw.newLine();
+        bw.write("-----------------------------------------------------------");
+        bw.newLine();
+        for (int i = 0; i < products.size(); i++) {
+
+            bw.write(products.get("producto" + i)[3] + " x  " + products.get("producto" + i)[1]
+                    + Spacing(products, products.get("producto" + i)[3] + " x  " + products.get("producto" + i)[1])
+                    + products.get("producto" + i)[4]);
+            bw.newLine();
+        }
+        bw.write("------------------------------------------------------------");
+        bw.newLine();
+        bw.write("Sub-Total:\t\t\t\t      " + total.get("subtotal"));
+        bw.newLine();
+        bw.write("IVA (16%):\t\t\t\t      " + total.get("iva"));
+        bw.newLine();
+        bw.write("Total:\t\t\t\t\t      " + total.get("total"));
+        bw.newLine();
+        bw.close();
     }
 
     public void TranslateXML(String name) throws Exception {
@@ -163,7 +178,6 @@ public class App {
 
         HashMap<String, String> TicketData = new HashMap<String, String>();
         HashMap<String, String[]> TicketProducts = new HashMap<String, String[]>();
-        Object[] Products = new Object[ProductsList.getLength()];
         HashMap<String, String> TicketTotal = new HashMap<String, String>();
 
         int pos = 0;
@@ -201,7 +215,7 @@ public class App {
                 TicketProducts.put("producto" + i, temp);
             }
             temp = null;
-            pos=0;
+            pos = 0;
         }
 
         Node Totalnode = TotalList.item(0);
@@ -218,7 +232,7 @@ public class App {
             }
         }
 
-        toText(TicketData, TicketProducts, TicketTotal, Products);
+        toText(TicketData, TicketProducts, TicketTotal);
         TicketData = null;
         TicketProducts = null;
         TicketTotal = null;
