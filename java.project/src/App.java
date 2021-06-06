@@ -2,8 +2,11 @@ import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import static java.nio.file.StandardWatchEventKinds.*;
+
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.WatchEvent;
@@ -22,6 +25,7 @@ import java.util.*;
 import java.util.List;
 import java.util.Timer;
 import java.awt.*;
+import java.awt.print.PrinterJob;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -31,9 +35,10 @@ import java.awt.event.WindowEvent;
 import java.awt.TrayIcon.MessageType;
 import javax.swing.*;
 
-public class App extends JFrame implements ActionListener{
+public class App extends JFrame implements ActionListener {
     File Log = new File(System.getProperty("user.home") + "/desktop/Logs.txt");
     File FinalFile = new File(System.getProperty("user.home") + "/desktop/Factura.txt");
+    File PrinterConfig = new File(System.getProperty("user.home") + "/desktop/PrinterConfig.ini");
     static JFrame f = new JFrame();
     private PopupMenu popup = new PopupMenu();
     private final Image image = new ImageIcon(getClass().getResource("up.ico")).getImage();
@@ -43,27 +48,30 @@ public class App extends JFrame implements ActionListener{
     final JMenuBar ToolBar;
     final JMenu Menu1;
     final JMenu Menu2;
-    final JMenuItem mi1, mi2, mi3;
+    final JMenuItem mi1, mi2, mi3, mi4;
 
     public App(JFrame f) {
         App.f = f;
 
-        ToolBar=new JMenuBar();
+        ToolBar = new JMenuBar();
         f.add(ToolBar);
-        ToolBar.setBounds(0,0,400,20);
-        Menu1=new JMenu("Archivo");
+        ToolBar.setBounds(0, 0, 400, 20);
+        Menu1 = new JMenu("Archivo");
         ToolBar.add(Menu1);
-        Menu2=new JMenu("Configuracion");
-        ToolBar.add(Menu2);
-        mi1=new JMenuItem("Ver descargas");
+        mi1 = new JMenuItem("Ver descargas");
         mi1.addActionListener(this);
         Menu1.add(mi1);
-        mi2=new JMenuItem("Ver reportes");
+        mi2 = new JMenuItem("Ver reportes");
         mi2.addActionListener(this);
         Menu1.add(mi2);
-        mi3=new JMenuItem("Salir");
+        mi3 = new JMenuItem("Salir");
         mi3.addActionListener(this);
-        Menu1.add(mi3); 
+        Menu1.add(mi3);
+        Menu2 = new JMenu("Configuracion");
+        ToolBar.add(Menu2);
+        mi4 = new JMenuItem("Cambiar Impresora");
+        mi4.addActionListener(this);
+        Menu2.add(mi4);
 
         JLabel ActiveText;
         ActiveText = new JLabel("Esperando archivos...");
@@ -151,11 +159,11 @@ public class App extends JFrame implements ActionListener{
         // Cuando se minimiza JFrame, se oculta para que no aparesca en la barra de
         // tareas
         f.addWindowListener(new WindowAdapter() {
+
             public void windowIconified(WindowEvent e) {
                 f.setVisible(false);// Se oculta JFrame
                 MessageTray("Seguira funcionando en segundo plano", MessageType.INFO);
             }
-
 
         });
 
@@ -278,6 +286,8 @@ public class App extends JFrame implements ActionListener{
 
     public void toText(HashMap<String, String> data, HashMap<String, String[]> products, HashMap<String, String> total)
             throws IOException {
+        deleteFile(FinalFile);
+
         BufferedWriter bw = new BufferedWriter(new FileWriter(FinalFile, true));
         bw.write(Spacing(products, "") + data.get("razonSocial"));
         bw.newLine();
@@ -314,19 +324,85 @@ public class App extends JFrame implements ActionListener{
         bw.close();
     }
 
-    public void printBill(File bill) throws IOException {
-        // java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
-        // try {
-        //     desktop.print(bill);
-        //     System.out.println("Fue Impreso");
-        // } catch (Exception e) {
-        //     System.out.print("El sistema no permite imprimir usando la clase Desktop");
-        //     e.printStackTrace();
-        // }
+    public void ChangePrinter() throws IOException {
+        PrinterJob job = PrinterJob.getPrinterJob();
+        job.printDialog();
+        String impresora = job.getPrintService().getName();
 
-        // Impresion de archivos
+        // Apertura del fichero para borrar la informacion que contenia anteriormente
+        deleteFile(PrinterConfig);
+
+        BufferedWriter bw = new BufferedWriter(new FileWriter(PrinterConfig, true));
+        bw.write(impresora);
+        bw.close();
     }
-    
+
+    public String PrinterName() throws IOException {
+        FileReader fr = null;
+        BufferedReader br = null;
+        String Printer = "";
+
+        try {
+            // Apertura del fichero y creacion de BufferedReader para poder
+            // hacer una lectura comoda (disponer del metodo readLine()).
+            fr = new FileReader(PrinterConfig);
+            br = new BufferedReader(fr);
+
+            // Lectura del fichero
+            Printer = br.readLine();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            // En el finally cerramos el fichero, para asegurarnos
+            // que se cierra tanto si todo va bien como si salta
+            // una excepcion.
+            try {
+                if (null != fr) {
+                    fr.close();
+                }
+            } catch (Exception e2) {
+                e2.printStackTrace();
+            }
+        }
+
+        return Printer;
+    }
+
+    public void printBill(File bill) throws IOException {
+        // PrinterJob job = PrinterJob.getPrinterJob();
+        // job.printDialog();
+        String impresora = PrinterName();
+
+        // ESTE ES TU CÓDIGO
+        java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
+        // java.io.File fichero = new java.io.File(rutaDoc);
+        if (desktop.isSupported(Desktop.Action.PRINT)) {
+            try {
+                try {
+                    Process pr = Runtime.getRuntime()
+                            .exec("Rundll32 printui.dll,PrintUIEntry /y /n \"" + impresora + "\"");
+                } catch (Exception ex) {
+                    System.out.println("Ha ocurrido un error al ejecutar el comando. Error: " + ex);
+                }
+                desktop.print(bill);
+            } catch (Exception e) {
+                System.out.print("El sistema no permite imprimir usando la clase Desktop");
+                e.printStackTrace();
+            }
+        } else {
+            System.out.print("El sistema no permite imprimir usando la clase Desktop");
+        }
+    }
+
+    public void deleteFile(File f) {
+        f.delete();
+        try {
+            f.createNewFile();
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+    }
 
     public void TranslateXML(String name) throws Exception {
         File XML = new File(System.getProperty("user.home") + "/downloads/" + name);
@@ -405,32 +481,37 @@ public class App extends JFrame implements ActionListener{
         HeaderList = null;
         ProductsList = null;
         XML = null;
+        printBill(FinalFile);
         System.gc();
-
-        // printBill(FinalFile);
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (e.getSource()==mi1) {
+        if (e.getSource() == mi1) {
             try {
                 Runtime.getRuntime().exec("explorer.exe /select," + System.getProperty("user.home") + "/downloads");
             } catch (IOException e1) {
                 e1.printStackTrace();
             }
         }
-        if (e.getSource()==mi2) {
+        if (e.getSource() == mi2) {
             try {
                 Runtime.getRuntime().exec("explorer.exe /select," + System.getProperty("user.home") + "/desktop");
             } catch (IOException e1) {
                 e1.printStackTrace();
             }
-            
         }
-        if (e.getSource()==mi3) {
+        if (e.getSource() == mi3) {
             System.exit(0);
-        }  
-        
+        }
+        if (e.getSource() == mi4) {
+            try {
+                ChangePrinter();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+        }
+
     }
 
 }
