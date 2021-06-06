@@ -30,7 +30,6 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.TrayIcon.MessageType;
 import javax.swing.*;
-import javax.tools.Tool;
 
 public class App extends JFrame implements ActionListener{
     File Log = new File(System.getProperty("user.home") + "/desktop/Logs.txt");
@@ -41,17 +40,13 @@ public class App extends JFrame implements ActionListener{
     private final TrayIcon trayIcon = new TrayIcon(image, "App_Name esperando archivos", popup);
     private Timer timer;
 
-
-
+    final JMenuBar ToolBar;
+    final JMenu Menu1;
+    final JMenu Menu2;
+    final JMenuItem mi1, mi2, mi3;
 
     public App(JFrame f) {
         App.f = f;
-
-        final JMenuBar ToolBar;
-        final JMenu Menu1;
-        final JMenu Menu2;
-        final JMenu Menu3;
-        final JMenuItem mi1, mi2, mi3;
 
         ToolBar=new JMenuBar();
         f.add(ToolBar);
@@ -69,6 +64,12 @@ public class App extends JFrame implements ActionListener{
         mi3=new JMenuItem("Salir");
         mi3.addActionListener(this);
         Menu1.add(mi3); 
+
+        JLabel ActiveText;
+        ActiveText = new JLabel("Esperando archivos...");
+        ActiveText.setBounds(40, 30, 300, 100);
+        ActiveText.setFont(ActiveText.getFont().deriveFont(28.0f));
+        f.add(ActiveText);
 
         if (SystemTray.isSupported()) {
             SystemTray systemtray = SystemTray.getSystemTray();
@@ -162,16 +163,16 @@ public class App extends JFrame implements ActionListener{
 
     public static void main(String[] args) throws Exception {
         App app = new App(f);
+        f.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        f.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                f.setExtendedState(JFrame.ICONIFIED);
+            }
+        });
 
-
-
-        JLabel ActiveText;
-        ActiveText = new JLabel("Esperando archivos...");
-        ActiveText.setBounds(40, 30, 300, 100);
-        ActiveText.setFont(ActiveText.getFont().deriveFont(28.0f));
-
-        f.add(ActiveText);
         f.setSize(400, 200);// 400 width and 500 height
+        f.setResizable(false);
+        f.setLocationRelativeTo(null);
         f.setLayout(null);// using no layout managers
         f.setVisible(true);// making the frame visible
         app.FileWatcher();
@@ -391,6 +392,29 @@ public class App extends JFrame implements ActionListener{
         ProductsList = null;
         XML = null;
         System.gc();
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource()==mi1) {
+            try {
+                Runtime.getRuntime().exec("explorer.exe /select," + System.getProperty("user.home") + "/downloads");
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+        }
+        if (e.getSource()==mi2) {
+            try {
+                Runtime.getRuntime().exec("explorer.exe /select," + System.getProperty("user.home") + "/desktop");
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+            
+        }
+        if (e.getSource()==mi3) {
+            System.exit(0);
+        }  
+        
     }
 
 }
