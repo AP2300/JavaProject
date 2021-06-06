@@ -17,8 +17,6 @@ import javax.xml.parsers.DocumentBuilder;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 
-import jdk.internal.net.http.common.Log;
-
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 import java.util.*;
@@ -165,6 +163,20 @@ public class App {
         bw.close();
     }
 
+    public void printBill(File bill) throws IOException {
+        // java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
+        // try {
+        //     desktop.print(bill);
+        //     System.out.println("Fue Impreso");
+        // } catch (Exception e) {
+        //     System.out.print("El sistema no permite imprimir usando la clase Desktop");
+        //     e.printStackTrace();
+        // }
+
+        // Impresion de archivos
+    }
+    
+
     public void TranslateXML(String name) throws Exception {
         File XML = new File(System.getProperty("user.home") + "/downloads/" + name);
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -243,6 +255,8 @@ public class App {
         ProductsList = null;
         XML = null;
         System.gc();
+
+        // printBill(FinalFile);
     }
 
 }
