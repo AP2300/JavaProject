@@ -16,20 +16,171 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
-
 import org.w3c.dom.Node;
 import org.w3c.dom.Element;
 import java.util.*;
+import java.util.List;
+import java.util.Timer;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.TrayIcon.MessageType;
+import javax.swing.*;
 
-public class App {
+public class App extends JFrame implements ActionListener{
+    File Log = new File(System.getProperty("user.home") + "/desktop/Logs.txt");
+    File FinalFile = new File(System.getProperty("user.home") + "/desktop/Factura.txt");
+    static JFrame f = new JFrame();
+    private PopupMenu popup = new PopupMenu();
+    private final Image image = new ImageIcon(getClass().getResource("up.ico")).getImage();
+    private final TrayIcon trayIcon = new TrayIcon(image, "App_Name esperando archivos", popup);
+    private Timer timer;
+
+    final JMenuBar ToolBar;
+    final JMenu Menu1;
+    final JMenu Menu2;
+    final JMenuItem mi1, mi2, mi3;
+
+    public App(JFrame f) {
+        App.f = f;
+
+        ToolBar=new JMenuBar();
+        f.add(ToolBar);
+        ToolBar.setBounds(0,0,400,20);
+        Menu1=new JMenu("Archivo");
+        ToolBar.add(Menu1);
+        Menu2=new JMenu("Configuracion");
+        ToolBar.add(Menu2);
+        mi1=new JMenuItem("Ver descargas");
+        mi1.addActionListener(this);
+        Menu1.add(mi1);
+        mi2=new JMenuItem("Ver reportes");
+        mi2.addActionListener(this);
+        Menu1.add(mi2);
+        mi3=new JMenuItem("Salir");
+        mi3.addActionListener(this);
+        Menu1.add(mi3); 
+
+        JLabel ActiveText;
+        ActiveText = new JLabel("Esperando archivos...");
+        ActiveText.setBounds(40, 30, 300, 100);
+        ActiveText.setFont(ActiveText.getFont().deriveFont(28.0f));
+        f.add(ActiveText);
+
+        if (SystemTray.isSupported()) {
+            SystemTray systemtray = SystemTray.getSystemTray();
+            trayIcon.setImageAutoSize(true);
+
+            MouseListener mouseListener = new MouseListener() {
+
+                @Override
+                public void mouseClicked(MouseEvent evt) {
+                    // Si se presiona con el boton izquierdo en el icono
+                    // y la aplicacion esta minimizada se muestra una frase
+                    if (evt.getButton() == MouseEvent.BUTTON1 && f.getExtendedState() == JFrame.ICONIFIED) {
+                        if (evt.getClickCount() % 2 == 0 && !evt.isConsumed()) {
+                            evt.consume();
+                            if (f.getExtendedState() == JFrame.ICONIFIED) {
+                                f.setVisible(true);
+                                f.setExtendedState(JFrame.NORMAL);
+                                f.repaint();
+                                if (timer != null)
+                                    timer.cancel();
+                            }
+                        }
+                    }
+                }
+
+                @Override
+                public void mouseEntered(MouseEvent evt) {
+                    /* nada x aqui circulen... */}
+
+                @Override
+                public void mouseExited(MouseEvent evt) {
+                    /* nada x aqui circulen... */}
+
+                @Override
+                public void mousePressed(MouseEvent evt) {
+                    /* nada x aqui circulen... */}
+
+                @Override
+                public void mouseReleased(MouseEvent evt) {
+                    /* nada x aqui circulen... */}
+            };
+
+            ActionListener exitListener = (ActionEvent e) -> {
+                System.exit(0);
+            };
+
+            ActionListener restoreListener = (ActionEvent e) -> {
+                // si esta minimizado restaura JFrame
+                if (f.getExtendedState() == JFrame.ICONIFIED) {
+                    f.setVisible(true);
+                    f.setExtendedState(JFrame.NORMAL);
+                    f.repaint();
+                    if (timer != null)
+                        timer.cancel();
+                }
+            };
+
+            MenuItem restoreAppItem = new MenuItem("Restaurar");
+            restoreAppItem.addActionListener(restoreListener);
+            popup.add(restoreAppItem);
+
+            MenuItem exitAppItem = new MenuItem("Salir");
+            exitAppItem.addActionListener(exitListener);
+            popup.add(exitAppItem);
+
+            trayIcon.addMouseListener(mouseListener);
+
+            // Añade el TrayIcon al SystemTray
+            try {
+                systemtray.add(trayIcon);
+            } catch (AWTException e) {
+                System.err.println("Error:" + e.getMessage());
+            }
+        } else {
+            System.err.println("Error: SystemTray no es soportado");
+            return;
+        }
+
+        // Cuando se minimiza JFrame, se oculta para que no aparesca en la barra de
+        // tareas
+        f.addWindowListener(new WindowAdapter() {
+            public void windowIconified(WindowEvent e) {
+                f.setVisible(false);// Se oculta JFrame
+                MessageTray("Seguira funcionando en segundo plano", MessageType.INFO);
+            }
+
+
+        });
+
+    }
 
     public static void main(String[] args) throws Exception {
-        App app = new App();
+        App app = new App(f);
+        f.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        f.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                f.setExtendedState(JFrame.ICONIFIED);
+            }
+        });
+
+        f.setSize(400, 200);// 400 width and 500 height
+        f.setResizable(false);
+        f.setLocationRelativeTo(null);
+        f.setLayout(null);// using no layout managers
+        f.setVisible(true);// making the frame visible
         app.FileWatcher();
     }
 
-    File Log = new File(System.getProperty("user.home") + "/desktop/Logs.txt");
-    File FinalFile = new File(System.getProperty("user.home") + "/desktop/Factura.txt");
+    public void MessageTray(String text, MessageType type) {
+        trayIcon.displayMessage("App_Name", text, type);
+    }
 
     public void FileWatcher() throws Exception {
         WatchService watcher = FileSystems.getDefault().newWatchService();
@@ -257,6 +408,29 @@ public class App {
         System.gc();
 
         // printBill(FinalFile);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource()==mi1) {
+            try {
+                Runtime.getRuntime().exec("explorer.exe /select," + System.getProperty("user.home") + "/downloads");
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+        }
+        if (e.getSource()==mi2) {
+            try {
+                Runtime.getRuntime().exec("explorer.exe /select," + System.getProperty("user.home") + "/desktop");
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+            
+        }
+        if (e.getSource()==mi3) {
+            System.exit(0);
+        }  
+        
     }
 
 }
