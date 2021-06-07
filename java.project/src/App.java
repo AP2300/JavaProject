@@ -39,7 +39,10 @@ public class App extends JFrame implements ActionListener {
     File Log = new File(System.getProperty("user.home") + "/desktop/Logs.txt");
     File FinalFile = new File(System.getProperty("user.home") + "/desktop/Factura.txt");
     File PrinterConfig = new File(System.getProperty("user.home") + "/desktop/PrinterConfig.ini");
+
     static JFrame f = new JFrame();
+    static JFrame fp = new JFrame();
+
     private PopupMenu popup = new PopupMenu();
     private final Image image = new ImageIcon(getClass().getResource("up.ico")).getImage();
     private final TrayIcon trayIcon = new TrayIcon(image, "App_Name esperando archivos", popup);
@@ -50,8 +53,9 @@ public class App extends JFrame implements ActionListener {
     final JMenu Menu2;
     final JMenuItem mi1, mi2, mi3, mi4;
 
-    public App(JFrame f) {
+    public App(JFrame f, JFrame fp) {
         App.f = f;
+        App.fp = fp;
 
         ToolBar = new JMenuBar();
         f.add(ToolBar);
@@ -170,13 +174,19 @@ public class App extends JFrame implements ActionListener {
     }
 
     public static void main(String[] args) throws Exception {
-        App app = new App(f);
+        App app = new App(f, fp);
         f.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         f.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent e) {
                 f.setExtendedState(JFrame.ICONIFIED);
             }
         });
+
+        fp.setSize(400, 200);
+        fp.setResizable(false);
+        fp.setLocationRelativeTo(null);
+        fp.setLayout(null);
+
 
         f.setSize(400, 200);// 400 width and 500 height
         f.setResizable(false);
@@ -218,6 +228,7 @@ public class App extends JFrame implements ActionListener {
                     } else if (eventType == ENTRY_DELETE) {
                         Logger("Archivo " + fileName.toString() + " Eliminado");
                     } else if (eventType == ENTRY_MODIFY) {
+                        fp.setVisible(true);
                         Logger("Archivo " + fileName.toString() + " Creado");
                         TranslateXML(fileName.toString());
                     }
@@ -472,6 +483,8 @@ public class App extends JFrame implements ActionListener {
         }
 
         toText(TicketData, TicketProducts, TicketTotal);
+        Await(4);
+        fp.setVisible(false);
         TicketData = null;
         TicketProducts = null;
         TicketTotal = null;
