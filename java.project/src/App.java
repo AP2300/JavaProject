@@ -53,9 +53,25 @@ public class App extends JFrame implements ActionListener {
     final JMenu Menu2;
     final JMenuItem mi1, mi2, mi3, mi4;
 
+    JProgressBar pb;
+    int i = 0, num = 0;
+
     public App(JFrame f, JFrame fp) {
         App.f = f;
         App.fp = fp;
+
+        // JLabel PopupText;
+        // PopupText = new JLabel("Procesando...");
+        // PopupText.setBounds(40, 30, 300, 100);
+        // PopupText.setFont(PopupText.getFont().deriveFont(28.0f));
+        // fp.add(PopupText);
+        // fp.setVisible(true);
+
+        pb = new JProgressBar(0, 2000);
+        pb.setBounds(0, 0, 390, 180);
+        pb.setValue(0);
+        pb.setStringPainted(true);
+        fp.add(pb);
 
         ToolBar = new JMenuBar();
         f.add(ToolBar);
@@ -171,6 +187,8 @@ public class App extends JFrame implements ActionListener {
 
         });
 
+        
+
     }
 
     public static void main(String[] args) throws Exception {
@@ -181,12 +199,12 @@ public class App extends JFrame implements ActionListener {
                 f.setExtendedState(JFrame.ICONIFIED);
             }
         });
+        
 
         fp.setSize(400, 200);
         fp.setResizable(false);
         fp.setLocationRelativeTo(null);
         fp.setLayout(null);
-
 
         f.setSize(400, 200);// 400 width and 500 height
         f.setResizable(false);
@@ -194,6 +212,20 @@ public class App extends JFrame implements ActionListener {
         f.setLayout(null);// using no layout managers
         f.setVisible(true);// making the frame visible
         app.FileWatcher();
+    }
+
+    public void iterate() {
+            System.out.println("hola");
+            while (i <= 2000) {
+            pb.setValue(i);
+            pb.repaint();
+            i = i + 100;
+            try {
+                Thread.sleep(150);
+            } catch (Exception e) {
+                System.err.println(e);
+            }
+        }
     }
 
     public void MessageTray(String text, MessageType type) {
@@ -229,6 +261,8 @@ public class App extends JFrame implements ActionListener {
                         Logger("Archivo " + fileName.toString() + " Eliminado");
                     } else if (eventType == ENTRY_MODIFY) {
                         fp.setVisible(true);
+                        fp.setAlwaysOnTop(true);
+                        iterate();
                         Logger("Archivo " + fileName.toString() + " Creado");
                         TranslateXML(fileName.toString());
                     }
@@ -483,8 +517,8 @@ public class App extends JFrame implements ActionListener {
         }
 
         toText(TicketData, TicketProducts, TicketTotal);
-        Await(4);
         fp.setVisible(false);
+        i=0;
         TicketData = null;
         TicketProducts = null;
         TicketTotal = null;
@@ -502,14 +536,18 @@ public class App extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == mi1) {
             try {
-                Runtime.getRuntime().exec("explorer.exe /select," + System.getProperty("user.home") + "/downloads");
+                File file = new File(System.getProperty("user.home") + "/downloads");
+                Desktop desktop = Desktop.getDesktop();
+                desktop.open(file);
             } catch (IOException e1) {
                 e1.printStackTrace();
             }
         }
         if (e.getSource() == mi2) {
             try {
-                Runtime.getRuntime().exec("explorer.exe /select," + System.getProperty("user.home") + "/desktop");
+                File file = new File(System.getProperty("user.home") + "/desktop");
+                Desktop desktop = Desktop.getDesktop();
+                desktop.open(file);
             } catch (IOException e1) {
                 e1.printStackTrace();
             }
