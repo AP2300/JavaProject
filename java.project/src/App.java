@@ -1,8 +1,6 @@
 import java.nio.file.FileSystems;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 
 import static java.nio.file.StandardWatchEventKinds.*;
 
@@ -43,6 +41,7 @@ import java.awt.TrayIcon.MessageType;
 import javax.swing.*;
 
 public class App extends JFrame implements ActionListener {
+    Boolean Flag = false;
     File Log = new File(System.getProperty("user.home") + "/desktop/Logs.txt");
     File FinalFile = new File(System.getProperty("user.home") + "/desktop/Factura.txt");
     File PrinterConfig = new File(System.getProperty("user.home") + "/desktop/PrinterConfig.ini");
@@ -58,10 +57,32 @@ public class App extends JFrame implements ActionListener {
     final JMenuBar ToolBar;
     final JMenu Menu1;
     final JMenu Menu2;
-    final JMenuItem mi1, mi2, mi3, mi4;
+    final JMenuItem mi1, mi2, mi3, mi4, mi5;
 
     JProgressBar pb;
     int i = 0, num = 0;
+
+    public static void main(String[] args) throws Exception {
+        App app = new App(f, fp);
+        f.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        f.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                f.setExtendedState(JFrame.ICONIFIED);
+            }
+        });
+
+        fp.setSize(400, 200);
+        fp.setResizable(false);
+        fp.setLocationRelativeTo(null);
+        fp.setLayout(null);
+
+        f.setSize(400, 200);// 400 width and 500 height
+        f.setResizable(false);
+        f.setLocationRelativeTo(null);
+        f.setLayout(null);// using no layout managers
+        f.setVisible(true);// making the frame visible
+        app.FileWatcher();
+    }
 
     public App(JFrame f, JFrame fp) {
         App.f = f;
@@ -91,14 +112,18 @@ public class App extends JFrame implements ActionListener {
         mi2 = new JMenuItem("Ver reportes");
         mi2.addActionListener(this);
         Menu1.add(mi2);
-        mi3 = new JMenuItem("Salir");
+        mi3 = new JMenuItem("Ver Logs");
         mi3.addActionListener(this);
         Menu1.add(mi3);
+        mi4 = new JMenuItem("Salir");
+        mi4.addActionListener(this);
+        Menu1.add(mi4);
         Menu2 = new JMenu("Configuracion");
         ToolBar.add(Menu2);
-        mi4 = new JMenuItem("Cambiar Impresora");
-        mi4.addActionListener(this);
-        Menu2.add(mi4);
+        mi5 = new JMenuItem("Cambiar Impresora");
+        mi5.addActionListener(this);
+        Menu2.add(mi5);
+        
 
         JLabel ActiveText;
         ActiveText = new JLabel("Esperando archivos...");
@@ -196,28 +221,6 @@ public class App extends JFrame implements ActionListener {
 
     }
 
-    public static void main(String[] args) throws Exception {
-        App app = new App(f, fp);
-        f.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        f.addWindowListener(new WindowAdapter() {
-            public void windowClosing(WindowEvent e) {
-                f.setExtendedState(JFrame.ICONIFIED);
-            }
-        });
-
-        fp.setSize(400, 200);
-        fp.setResizable(false);
-        fp.setLocationRelativeTo(null);
-        fp.setLayout(null);
-
-        f.setSize(400, 200);// 400 width and 500 height
-        f.setResizable(false);
-        f.setLocationRelativeTo(null);
-        f.setLayout(null);// using no layout managers
-        f.setVisible(true);// making the frame visible
-        app.FileWatcher();
-    }
-
     public void iterate() {
         while (i <= 2000) {
             pb.setValue(i);
@@ -258,16 +261,20 @@ public class App extends JFrame implements ActionListener {
                         continue;
                     } else if (eventType == ENTRY_CREATE) {
                         // System.out.println(fileName.getFileName());
-                        Logger("Archivo " + fileName.toString() + " Creado");
+                        // Logger("Archivo " + fileName.toString() + " Creado");
                         Await(1);
                     } else if (eventType == ENTRY_DELETE) {
                         Logger("Archivo " + fileName.toString() + " Eliminado");
                     } else if (eventType == ENTRY_MODIFY) {
-                        fp.setVisible(true);
-                        fp.setAlwaysOnTop(true);
-                        iterate();
-                        Logger("Archivo " + fileName.toString() + " Creado");
-                        TranslateXML(fileName.toString());
+                        if (!Flag) {
+                            Logger("Archivo " + fileName.toString() + " Creado");
+                            fp.setVisible(true);
+                            fp.setAlwaysOnTop(true);
+                            iterate();
+                            TranslateXML(fileName.toString());
+                        } else {
+                            Flag = false;
+                        }
                     }
                 }
 
@@ -372,12 +379,26 @@ public class App extends JFrame implements ActionListener {
         bw.close();
     }
 
+    public String getDate() {
+        Calendar date = new GregorianCalendar();
+        int year = date.get(Calendar.YEAR);
+        int month = date.get(Calendar.MONTH) + 1;
+        int day = date.get(Calendar.DAY_OF_MONTH);
+        return day + "-" + month + "-" + year;
+    }
+
     public void saveBill(String name, String nroControl) throws IOException {
         File XML = new File(System.getProperty("user.home") + "/downloads/" + name);
-        File destinyDirectory = new File(System.getProperty("user.home") + "/desktop/Reportes/");
-        File destinyFile = new File(System.getProperty("user.home") + "/desktop/Reportes/" + nroControl + ".xml");
+        File reportsDirectory = new File(System.getProperty("user.home") + "/desktop/Reportes/");
+        File destinyDirectory = new File(System.getProperty("user.home") + "/desktop/Reportes/" + getDate() + "/");
+        File destinyFile = new File(
+                System.getProperty("user.home") + "/desktop/Reportes/" + getDate() + "/" + nroControl + ".xml");
+        if (!reportsDirectory.exists()) {
+            // No existe directorio destino, lo crea.
+            reportsDirectory.mkdir();
+        }
         if (!destinyDirectory.exists()) {
-            //No existe directorio destino, lo crea.
+            // No existe directorio destino, lo crea.
             destinyDirectory.mkdir();
         }
 
@@ -394,10 +415,12 @@ public class App extends JFrame implements ActionListener {
 
             in.close();
             out.close();
+            Logger("Archivo " + name + " Enviado a Reportes");
         } catch (IOException ioe) {
             ioe.printStackTrace();
         } finally {
             XML.delete();
+            Flag = true;
         }
 
     }
@@ -565,8 +588,8 @@ public class App extends JFrame implements ActionListener {
         ProductsList = null;
         XML = null;
         printBill(FinalFile);
-        saveBill(name, nroControl);
         System.gc();
+        saveBill(name, nroControl);
     }
 
     @Override
@@ -582,7 +605,7 @@ public class App extends JFrame implements ActionListener {
         }
         if (e.getSource() == mi2) {
             try {
-                File file = new File(System.getProperty("user.home") + "/desktop");
+                File file = new File(System.getProperty("user.home") + "/desktop/Reportes");
                 Desktop desktop = Desktop.getDesktop();
                 desktop.open(file);
             } catch (IOException e1) {
@@ -590,15 +613,25 @@ public class App extends JFrame implements ActionListener {
             }
         }
         if (e.getSource() == mi3) {
-            System.exit(0);
+            try {
+                File file = new File(System.getProperty("user.home") + "/desktop/Logs.txt");
+                Desktop desktop = Desktop.getDesktop();
+                desktop.open(file);
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
         }
         if (e.getSource() == mi4) {
+            System.exit(0);
+        }
+        if (e.getSource() == mi5) {
             try {
                 ChangePrinter();
             } catch (IOException e1) {
                 e1.printStackTrace();
             }
         }
+        
 
     }
 
