@@ -1,14 +1,21 @@
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+
 import static java.nio.file.StandardWatchEventKinds.*;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
@@ -187,8 +194,6 @@ public class App extends JFrame implements ActionListener {
 
         });
 
-        
-
     }
 
     public static void main(String[] args) throws Exception {
@@ -199,7 +204,6 @@ public class App extends JFrame implements ActionListener {
                 f.setExtendedState(JFrame.ICONIFIED);
             }
         });
-        
 
         fp.setSize(400, 200);
         fp.setResizable(false);
@@ -215,8 +219,7 @@ public class App extends JFrame implements ActionListener {
     }
 
     public void iterate() {
-            System.out.println("hola");
-            while (i <= 2000) {
+        while (i <= 2000) {
             pb.setValue(i);
             pb.repaint();
             i = i + 100;
@@ -369,6 +372,36 @@ public class App extends JFrame implements ActionListener {
         bw.close();
     }
 
+    public void saveBill(String name, String nroControl) throws IOException {
+        File XML = new File(System.getProperty("user.home") + "/downloads/" + name);
+        File destinyDirectory = new File(System.getProperty("user.home") + "/desktop/Reportes/");
+        File destinyFile = new File(System.getProperty("user.home") + "/desktop/Reportes/" + nroControl + ".xml");
+        if (!destinyDirectory.exists()) {
+            //No existe directorio destino, lo crea.
+            destinyDirectory.mkdir();
+        }
+
+        try {
+            InputStream in = new FileInputStream(XML);
+            OutputStream out = new FileOutputStream(destinyFile);
+
+            byte[] buf = new byte[1024];
+            int len;
+
+            while ((len = in.read(buf)) > 0) {
+                out.write(buf, 0, len);
+            }
+
+            in.close();
+            out.close();
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        } finally {
+            XML.delete();
+        }
+
+    }
+
     public void ChangePrinter() throws IOException {
         PrinterJob job = PrinterJob.getPrinterJob();
         job.printDialog();
@@ -450,6 +483,7 @@ public class App extends JFrame implements ActionListener {
     }
 
     public void TranslateXML(String name) throws Exception {
+        String nroControl = "";
         File XML = new File(System.getProperty("user.home") + "/downloads/" + name);
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
@@ -479,6 +513,8 @@ public class App extends JFrame implements ActionListener {
                 }
             }
         }
+
+        nroControl = TicketData.get("nroControl");
 
         for (int i = 0; i < ProductsList.getLength(); i++) {
             Node Productonode = ProductsList.item(i);
@@ -518,7 +554,7 @@ public class App extends JFrame implements ActionListener {
 
         toText(TicketData, TicketProducts, TicketTotal);
         fp.setVisible(false);
-        i=0;
+        i = 0;
         TicketData = null;
         TicketProducts = null;
         TicketTotal = null;
@@ -529,6 +565,7 @@ public class App extends JFrame implements ActionListener {
         ProductsList = null;
         XML = null;
         printBill(FinalFile);
+        saveBill(name, nroControl);
         System.gc();
     }
 
