@@ -41,13 +41,13 @@ import java.awt.TrayIcon.MessageType;
 import javax.swing.*;
 
 public class App extends JFrame implements ActionListener {
-    Boolean Flag = false;
+    String Flag = "vacio";
     File Log = new File(System.getProperty("user.home") + "/desktop/Logs.txt");
-    File FinalFile = new File(System.getProperty("user.home") + "/desktop/Factura.txt");
     File PrinterConfig = new File(System.getProperty("user.home") + "/desktop/PrinterConfig.ini");
 
     static JFrame f = new JFrame();
     static JFrame fp = new JFrame();
+    int iterator = 0;
 
     private PopupMenu popup = new PopupMenu();
     private final Image image = new ImageIcon(getClass().getResource("up.ico")).getImage();
@@ -81,6 +81,7 @@ public class App extends JFrame implements ActionListener {
         f.setLocationRelativeTo(null);
         f.setLayout(null);// using no layout managers
         f.setVisible(true);// making the frame visible
+        f.setAlwaysOnTop(true);
         app.FileWatcher();
     }
 
@@ -123,7 +124,6 @@ public class App extends JFrame implements ActionListener {
         mi5 = new JMenuItem("Cambiar Impresora");
         mi5.addActionListener(this);
         Menu2.add(mi5);
-        
 
         JLabel ActiveText;
         ActiveText = new JLabel("Esperando archivos...");
@@ -256,25 +256,30 @@ public class App extends JFrame implements ActionListener {
                 Kind<?> eventType = event.kind();
                 Path fileName = (Path) event.context();
 
+
                 if (CheckXML(fileName)) {
                     if (eventType == OVERFLOW) {
                         continue;
                     } else if (eventType == ENTRY_CREATE) {
-                        // System.out.println(fileName.getFileName());
-                        // Logger("Archivo " + fileName.toString() + " Creado");
+                        if (!fileName.toString().equals(Flag)) {
+                            System.out.println("puta");
+                            Flag = fileName.toString();
+                            System.out.println(Flag);
+                            System.out.println(Flag.equals("vacio"));
+                            if(!Flag.equals("vacio")){
+                                System.out.println("bida");
+                                Logger("Archivo " + fileName.toString() + " Creado");
+                                fp.setVisible(true);
+                                fp.setAlwaysOnTop(true);
+                                iterate();
+                                TranslateXML(fileName.toString());
+                            }
+                        }
                         Await(1);
                     } else if (eventType == ENTRY_DELETE) {
                         Logger("Archivo " + fileName.toString() + " Eliminado");
                     } else if (eventType == ENTRY_MODIFY) {
-                        if (!Flag) {
-                            Logger("Archivo " + fileName.toString() + " Creado");
-                            fp.setVisible(true);
-                            fp.setAlwaysOnTop(true);
-                            iterate();
-                            TranslateXML(fileName.toString());
-                        } else {
-                            Flag = false;
-                        }
+                        //puto modify
                     }
                 }
 
@@ -322,8 +327,8 @@ public class App extends JFrame implements ActionListener {
 
     public String Spacing(HashMap<String, String[]> products, String comparator) {
         String spc = "";
-
-        String ref = products.get("producto1")[3] + " x  " + products.get("producto1")[1];
+        
+        String ref = products.get("producto0")[3] + " x  " + products.get("producto0")[1];
         for (String[] i : products.values()) {
             if (ref.length() < (i[3] + " x  " + i[1]).length()) {
                 ref = i[3] + " x  " + i[1];
@@ -339,11 +344,12 @@ public class App extends JFrame implements ActionListener {
         return spc;
     }
 
-    public void toText(HashMap<String, String> data, HashMap<String, String[]> products, HashMap<String, String> total)
+    public void toText(HashMap<String, String> data, HashMap<String, String[]> products, HashMap<String, String> total, File file)
             throws IOException {
-        deleteFile(FinalFile);
 
-        BufferedWriter bw = new BufferedWriter(new FileWriter(FinalFile, true));
+        deleteFile(file);
+
+        BufferedWriter bw = new BufferedWriter(new FileWriter(file, true));
         bw.write(Spacing(products, "") + data.get("razonSocial"));
         bw.newLine();
         bw.write(Spacing(products, "") + "     " + data.get("direccionEmpresa"));
@@ -377,6 +383,8 @@ public class App extends JFrame implements ActionListener {
         bw.write("Total:\t\t\t\t\t      " + total.get("total"));
         bw.newLine();
         bw.close();
+
+        iterator++;
     }
 
     public String getDate() {
@@ -420,7 +428,6 @@ public class App extends JFrame implements ActionListener {
             ioe.printStackTrace();
         } finally {
             XML.delete();
-            Flag = true;
         }
 
     }
@@ -506,6 +513,7 @@ public class App extends JFrame implements ActionListener {
     }
 
     public void TranslateXML(String name) throws Exception {
+        File FinalFile = new File(System.getProperty("user.home") + "/desktop/Factura" + iterator + ".txt");
         String nroControl = "";
         File XML = new File(System.getProperty("user.home") + "/downloads/" + name);
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -575,7 +583,7 @@ public class App extends JFrame implements ActionListener {
             }
         }
 
-        toText(TicketData, TicketProducts, TicketTotal);
+        toText(TicketData, TicketProducts, TicketTotal, FinalFile);
         fp.setVisible(false);
         i = 0;
         TicketData = null;
@@ -631,7 +639,6 @@ public class App extends JFrame implements ActionListener {
                 e1.printStackTrace();
             }
         }
-        
 
     }
 
