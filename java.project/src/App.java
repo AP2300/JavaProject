@@ -89,13 +89,6 @@ public class App extends JFrame implements ActionListener {
         App.f = f;
         App.fp = fp;
 
-        // JLabel PopupText;
-        // PopupText = new JLabel("Procesando...");
-        // PopupText.setBounds(40, 30, 300, 100);
-        // PopupText.setFont(PopupText.getFont().deriveFont(28.0f));
-        // fp.add(PopupText);
-        // fp.setVisible(true);
-
         pb = new JProgressBar(0, 2000);
         pb.setBounds(0, 0, 390, 180);
         pb.setValue(0);
@@ -256,7 +249,6 @@ public class App extends JFrame implements ActionListener {
                 Kind<?> eventType = event.kind();
                 Path fileName = (Path) event.context();
 
-
                 if (CheckXML(fileName)) {
                     if (eventType == OVERFLOW) {
                         continue;
@@ -266,7 +258,7 @@ public class App extends JFrame implements ActionListener {
                             Flag = fileName.toString();
                             System.out.println(Flag);
                             System.out.println(Flag.equals("vacio"));
-                            if(!Flag.equals("vacio")){
+                            if (!Flag.equals("vacio")) {
                                 System.out.println("bida");
                                 Logger("Archivo " + fileName.toString() + " Creado");
                                 fp.setVisible(true);
@@ -279,7 +271,7 @@ public class App extends JFrame implements ActionListener {
                     } else if (eventType == ENTRY_DELETE) {
                         Logger("Archivo " + fileName.toString() + " Eliminado");
                     } else if (eventType == ENTRY_MODIFY) {
-                        //puto modify
+                        // puto modify
                     }
                 }
 
@@ -327,7 +319,7 @@ public class App extends JFrame implements ActionListener {
 
     public String Spacing(HashMap<String, String[]> products, String comparator) {
         String spc = "";
-        
+
         String ref = products.get("producto0")[3] + " x  " + products.get("producto0")[1];
         for (String[] i : products.values()) {
             if (ref.length() < (i[3] + " x  " + i[1]).length()) {
@@ -344,8 +336,8 @@ public class App extends JFrame implements ActionListener {
         return spc;
     }
 
-    public void toText(HashMap<String, String> data, HashMap<String, String[]> products, HashMap<String, String> total, File file)
-            throws IOException {
+    public void toText(HashMap<String, String> data, HashMap<String, String[]> products, HashMap<String, String> total,
+            File file) throws IOException {
 
         deleteFile(file);
 
@@ -478,18 +470,12 @@ public class App extends JFrame implements ActionListener {
     }
 
     public void printBill(File bill) throws IOException {
-        // PrinterJob job = PrinterJob.getPrinterJob();
-        // job.printDialog();
-        String impresora = PrinterName();
-
         // ESTE ES TU CÓDIGO
         java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
-        // java.io.File fichero = new java.io.File(rutaDoc);
         if (desktop.isSupported(Desktop.Action.PRINT)) {
             try {
                 try {
-                    Process pr = Runtime.getRuntime()
-                            .exec("Rundll32 printui.dll,PrintUIEntry /y /n \"" + impresora + "\"");
+                    Runtime.getRuntime().exec("Rundll32 printui.dll,PrintUIEntry /y /n \"" + PrinterName() + "\"");
                 } catch (Exception ex) {
                     System.out.println("Ha ocurrido un error al ejecutar el comando. Error: " + ex);
                 }
