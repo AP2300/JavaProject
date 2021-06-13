@@ -599,6 +599,11 @@ public class App extends JFrame implements ActionListener {
         }
         if (e.getSource() == mi2) {
             try {
+                File reportsDirectory = new File(System.getProperty("user.home") + "/desktop/Reportes/");
+                if (!reportsDirectory.exists()) {
+                    // No existe directorio destino, lo crea.
+                    reportsDirectory.mkdir();
+                }
                 File file = new File(System.getProperty("user.home") + "/desktop/Reportes");
                 Desktop desktop = Desktop.getDesktop();
                 desktop.open(file);
